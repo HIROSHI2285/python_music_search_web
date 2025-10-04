@@ -355,14 +355,14 @@ def generate_html(artist, tracks_data):
         }}
 
         .btn-youtube {{
-            background: rgba(255, 255, 255, 0.08);
+            background: #FF0000;
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
         }}
 
         .btn-youtube:hover {{
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: #CC0000;
+            border-color: rgba(255, 0, 0, 0.5);
             transform: scale(1.05);
         }}
 
@@ -370,6 +370,16 @@ def generate_html(artist, tracks_data):
             opacity: 0.3;
             cursor: not-allowed;
             transform: none !important;
+        }}
+
+        .btn-youtube:disabled {{
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }}
+
+        .btn-youtube:disabled:hover {{
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
         }}
 
         /* プレイヤーコンテナ */
@@ -380,10 +390,39 @@ def generate_html(artist, tracks_data):
             overflow: hidden;
             display: none;
             animation: fadeIn 0.3s ease;
+            position: relative;
         }}
 
         .player-container.active {{
             display: block;
+        }}
+
+        .close-button {{
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #FF0000;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }}
+
+        .close-button:hover {{
+            background: #CC0000;
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(255, 0, 0, 0.6);
         }}
 
         .spotify-player iframe {{
@@ -513,24 +552,16 @@ def generate_html(artist, tracks_data):
         """
 
         youtube_button = f"""
-            <button class="btn btn-youtube" onclick="toggleYouTube({track['rank']})">
+            <a href="https://www.youtube.com/watch?v={track['video_id']}" target="_blank" class="btn btn-youtube">
                 YouTube
-            </button>
+            </a>
         """ if track['video_id'] else """
             <button class="btn btn-youtube" disabled>
                 YouTube N/A
             </button>
         """
 
-        youtube_player = f"""
-            <div class="player-container youtube-player" id="youtube-player-{track['rank']}">
-                <iframe
-                    src="https://www.youtube.com/embed/{track['video_id']}?enablejsapi=1"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen>
-                </iframe>
-            </div>
-        """ if track['video_id'] else ""
+        youtube_player = ""
 
         html += f"""
             <div class="track-card" style="animation-delay: {track['rank'] * 0.05}s">
@@ -587,6 +618,14 @@ def generate_html(artist, tracks_data):
             if (player) {{
                 player.classList.add('active');
                 currentPlayer = player;
+            }}
+        }}
+
+        function closeYouTube(rank) {{
+            const player = document.getElementById('youtube-player-' + rank);
+            if (player) {{
+                player.classList.remove('active');
+                currentPlayer = null;
             }}
         }}
 
